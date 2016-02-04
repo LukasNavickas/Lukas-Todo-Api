@@ -37,13 +37,16 @@ app.get('/todos', function(req, res) {
 // get /todos/:id
 app.get('/todos/:id', function(req, res) {
     var todoId = parseInt(req.params.id, 10); // because we get "string"
-    var matchedTodo = _.findWhere(todos, {id: todoId});
     
-    if(matchedTodo) {
-        res.json(matchedTodo);
-    } else {
-        res.status(404).send();
-    }
+    db.todo.findById(todoId).then(function(todo) {
+       if(!!todo) { // gives object or 0, truthy or falsy
+           res.json(todo.toJSON());
+       } else {
+           res.status(404).send();
+       }
+    }, function(e) {
+        res.status(500).send();
+    });
 });
 
 // POST /todos
